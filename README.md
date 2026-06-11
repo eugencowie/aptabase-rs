@@ -1,129 +1,88 @@
-![Aptabase](https://aptabase.com/og.png)
+# aptabase-rs
 
-# Tauri Plugin for Aptabase
+`aptabase-rs` is a framework-independent Aptabase client for Rust applications. It synchronously queues events in memory and delivers them with an asynchronous Tokio/Reqwest transport.
 
-This plugin allows you to instrument your app with events that can be analyzed in Aptabase, an Open Source, Privacy-First, and Simple Analytics for Mobile, Desktop, and Web Apps.
-
-## Install
-
-Install the Core plugin by adding the following to your `Cargo.toml` file:
-
-`src-tauri/Cargo.toml`
+## Installation
 
 ```toml
 [dependencies]
-tauri-plugin-aptabase = "1.0.0"
+aptabase-rs = "1.0.0"
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
-```toml
-[dependencies]
-tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase" }
-```
+## CLI usage
 
-You can install the JavaScript Guest bindings using your preferred JavaScript package manager
-
-```bash
-npm add @aptabase/tauri
-```
-
-```bash
-npm add https://github.com/aptabase/tauri-plugin-aptabase
-```
-
-## Usage
-
-First, you need to get your `App Key` from Aptabase, you can find it in the `Instructions` menu on the left side menu.
-
-Then register the plugin with Tauri:
-
-`src-tauri/src/main.rs`
+Create the client with an Aptabase app key and your application version. Event tracking does not perform network I/O; explicitly await `flush` before a short-lived process exits.
 
 ```rust
-#[tokio::main]
-async fn main() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_aptabase::Builder::new("<YOUR_APP_KEY>").build()) // 👈 this is where you enter your App Key
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
-```
-
-And finally add `aptabase:allow-track-event` to your list Access Control List.
-
-You can then start sending events from Rust by importing the `tauri_plugin_aptabase::EventTracker` trait and calling the `track_event` method on `App`, `AppHandle` or `Window`. 
-
-As an example, you can add `app_started` and `app_exited` events like this:
-
-```rust
-use tauri_plugin_aptabase::EventTracker;
+use aptabase_rs::AptabaseClient;
+use serde_json::json;
 
 #[tokio::main]
-async fn main() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_aptabase::init("<YOUR_APP_KEY>".into()))
-        .setup(|app| {
-            app.track_event("app_started", None);
-            Ok(())
-        })
-        .build(tauri::generate_context!())
-        .expect("error while running tauri application")
-        .run(|handler, event| match event {
-            tauri::RunEvent::Exit { .. } => {
-                handler.track_event("app_exited", None);
-                handler.flush_events_blocking();
-            }
-            _ => {}
-        })
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AptabaseClient::new("A-US-your-app-key", env!("CARGO_PKG_VERSION"));
+
+    client.track_event("command_started", Some(json!({ "command": "sync" })))?;
+    client.flush().await;
+
+    Ok(())
 }
 ```
 
-The `trackEvent` function is also available through the JavaScript guest bindings:
+Properties must be a `serde_json::Value::Object`. Invalid app keys disable tracking without making construction fail.
 
-```js
-import { trackEvent } from "@aptabase/tauri";
+## Periodic flushing
 
-trackEvent("save_settings") // An event with no properties
-trackEvent("screen_view", { name: "Settings" }) // An event with a custom property
-```
-
-A few important notes:
-
-1. The plugin will automatically enhance the event with some useful information, like the OS, the app version, and other things.
-2. You're in control of what gets sent to Aptabase. This plugin does not automatically track any events, you need to call `trackEvent` manually.
-    - Because of this, it's generally recommended to at least track an event at startup
-3. You do not need to await for the `trackEvent` function, it'll run in the background.
-3. Only strings and numbers values are allowed on custom properties
-
-## Providing the APTABASE_KEY via .env
-
-It's possible to load the APTABASE_KEY from a .env file at compile time using the `dotenvy_macro` crate. The `.env` file needs to be
-in the `src-tauri` directory for the `dotevny_macro` crate to find it properly.
-
-Add the `use` declaration to where you are building the tauri app (likely `lib.rs` for Tauri v2), and then call it where you would put the key.
+Long-running applications can start a periodic worker on an active Tokio runtime. The interval defaults to 60 seconds in release builds and 2 seconds in debug builds.
 
 ```rust
-use tauri_plugin_aptabase::EventTracker;
-use dotenvy_macro::dotenv;
+use aptabase_rs::AptabaseClient;
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-/// This function sets up and runs a Rust application using the Tauri framework, with various plugins
-/// and event handlers.
-pub fn run() {
-    tauri::Builder::default()
-        .build(tauri::generate_context!())
-        .plugin(tauri_plugin_aptabase::Builder::new(dotenv!("APTABASE_KEY")).build())
-        .expect("Error when building tauri app")
-        .run(|handler, event| match event {
-            tauri::RunEvent::Exit { .. } => {
-                handler.track_event("app_exited", None);
-                handler.flush_events_blocking();
-            }
-            tauri::RunEvent::Ready { .. } => {
-                handler.track_event("app_started", None);
-            }
-            _ => {}
-        });
-}
+let client = AptabaseClient::new("A-EU-your-app-key", "2.0.0");
+let worker = client.start_periodic_flush();
+
+client.track_event("service_started", None)?;
+
+// Stop the worker during shutdown, then deliver anything still queued.
+worker.abort();
+client.flush().await;
+# Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
-For AI/LLM integration instructions, see [llms.txt](./llms.txt)
+Start at most one periodic worker per client. Events are kept only in memory, so applications should explicitly flush during orderly shutdown.
+
+## Configuration
+
+Use `InitOptions` for a self-hosted endpoint, a custom periodic interval, or runtime metadata overrides.
+
+```rust
+use aptabase_rs::{AptabaseClient, InitOptions};
+use std::time::Duration;
+
+let client = AptabaseClient::with_options(
+    "A-SH-your-app-key",
+    "1.4.0",
+    InitOptions {
+        host: Some("https://analytics.example.com".into()),
+        flush_interval: Some(Duration::from_secs(30)),
+        engine_name: Some("my-cli-runtime".into()),
+        engine_version: Some("1.4.0".into()),
+    },
+);
+```
+
+Hosted keys beginning with `A-US-` and `A-EU-` use Aptabase's regional endpoints. `A-DEV-` targets `http://localhost:3000`, and `A-SH-` requires `host`.
+
+## Delivery behavior
+
+- Requests contain at most 25 events and use Aptabase's `/api/v0/events` endpoint.
+- Transport failures and HTTP 5xx responses are requeued in memory for a later flush.
+- Other unsuccessful HTTP responses are discarded.
+- This crate provides only the asynchronous Tokio transport; it does not provide a blocking client.
+
+## Privacy
+
+The client never tracks events automatically. Applications decide which event names and properties to send. Each event includes the app version, SDK version, debug status, OS name and version, locale, and configured engine name and version. Avoid sending personal or sensitive data in event names or properties.
+
+See [Aptabase](https://aptabase.com) for service documentation and privacy guidance.

@@ -1,3 +1,9 @@
+## Unreleased
+
+* **Breaking:** replace the Tauri plugin in place with the framework-independent `aptabase-rs` crate.
+* Add synchronous event enqueueing, asynchronous explicit flushing, and caller-managed periodic flushing for Tokio applications.
+* Remove all Tauri dependencies, APIs, build scripts, permissions, WebView bindings, JavaScript metadata, and Tauri examples.
+
 ## 1.0.0
 
 * Update Tauri v2

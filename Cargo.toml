@@ -1,21 +1,20 @@
 [package]
-name = "tauri-plugin-aptabase"
+name = "aptabase-rs"
 version = "1.0.0"
 license = "MIT"
-description = "Tauri Plugin for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
+description = "Aptabase analytics client for Rust applications"
 authors = ["Guilherme Oenning"]
 edition = "2021"
 rust-version = "1.70"
 readme = "README.md"
-repository = "https://github.com/aptabase/tauri-plugin-aptabase"
-exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
-links = "tauri-plugin-aptabase"
+repository = "https://github.com/aptabase/aptabase-rs"
+homepage = "https://aptabase.com"
+keywords = ["analytics", "aptabase", "telemetry"]
+categories = ["api-bindings"]
+exclude = ["/openspec", "/AGENTS.md", "/mise.toml", "/mise.lock", "/llms.txt"]
 
 [dependencies]
-tauri = "2.2.5"
-tokio = "1.43.0"
-futures = "0.3.31"
-serde = "1.0.217"
+tokio = { version = "1.43.0", features = ["rt", "time"] }
 serde_json = "1.0.138"
 reqwest = { version = "0.12.12", features = ["json"] }
 time = { version = "0.3.37", features = ["formatting"] }
@@ -24,5 +23,5 @@ rand = "0.9.0"
 log = "0.4.25"
 sys-locale = "0.3.2"
 
-[build-dependencies]
-tauri-plugin = { version = "2.0.4", features = ["build"] }
+[dev-dependencies]
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread", "time"] }
