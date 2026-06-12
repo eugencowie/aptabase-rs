@@ -34,7 +34,7 @@ The client SHALL select the Aptabase ingestion endpoint from the app-key region,
 - **THEN** construction succeeds and subsequent event tracking performs no network delivery
 
 ### Requirement: Event enqueueing and payload compatibility
-The client SHALL synchronously enqueue named events without performing network I/O at the call site. Each event SHALL contain an RFC 3339 UTC timestamp, session ID, event name, system properties, application version, SDK version, and optional properties. Supplied properties MUST be a JSON object.
+The client SHALL synchronously enqueue named events without performing network I/O at the call site. Each event SHALL contain an RFC 3339 UTC timestamp, session ID, event name, `systemProps` with debug status, operating-system name, operating-system version, locale, application version, SDK version, and optional properties. Supplied properties MUST be a JSON object.
 
 #### Scenario: Enqueue an event without properties
 - **WHEN** a caller tracks an event name without properties on an enabled client
@@ -89,8 +89,8 @@ The client SHALL requeue a batch after a transport failure or server-error respo
 - **WHEN** Aptabase responds to a batch with a non-5xx unsuccessful status
 - **THEN** the batch is removed from the queue and is not retried automatically
 
-### Requirement: Explicit asynchronous flushing
-The client SHALL provide an asynchronous flush operation that can be awaited before a short-lived process exits. The operation SHALL attempt delivery of queued batches using Tokio. The crate SHALL NOT provide a runtime-independent blocking client as part of this change.
+### Requirement: Explicit flushing
+The client SHALL provide an asynchronous flush operation that can be awaited before a short-lived process exits. The operation SHALL attempt delivery of queued batches using Tokio. The crate SHALL NOT expose a blocking flush API or provide a separate `reqwest::blocking` transport as part of this change.
 
 #### Scenario: Flush before CLI exit
 - **WHEN** a Tokio-based CLI tracks an event and awaits the client's flush operation before returning
@@ -98,22 +98,33 @@ The client SHALL provide an asynchronous flush operation that can be awaited bef
 
 #### Scenario: Use the supported transport model
 - **WHEN** a caller needs to deliver queued events
-- **THEN** the caller uses the Tokio-based asynchronous flush API rather than a runtime-independent blocking client
+- **THEN** the caller uses the Tokio-based asynchronous flush API
 
 ### Requirement: Optional periodic flushing
-The client SHALL allow a caller with an active Tokio runtime to start periodic flushing using the configured interval. The caller SHALL receive a means to manage or stop the periodic worker.
+The client SHALL allow a caller with an active Tokio runtime to start detached periodic flushing using the configured interval. The periodic worker SHALL run until the Tokio runtime shuts down.
 
 #### Scenario: Start periodic delivery
 - **WHEN** a long-running application starts periodic flushing
-- **THEN** the client attempts to flush queued events after each configured interval until the worker is stopped
+- **THEN** the client attempts to flush queued events after each configured interval until the Tokio runtime shuts down
 
-### Requirement: Generic and overridable system metadata
-The client SHALL collect debug status, operating-system name, operating-system version, and locale without Tauri. It SHALL provide generic runtime metadata defaults and allow applications to override the runtime or engine name and version while retaining the existing `systemProps` field names.
+### Requirement: Generic system metadata
+The client SHALL collect debug status, operating-system name, operating-system version, and locale without Tauri. It SHALL NOT query WebView runtime or engine metadata, and tracked events SHALL omit WebView-specific `engineName` and `engineVersion` fields.
 
 #### Scenario: Use generic metadata
-- **WHEN** a Rust application tracks an event without metadata overrides
+- **WHEN** a Rust application tracks an event
 - **THEN** the event contains generic Rust-compatible system properties and does not query a WebView
 
-#### Scenario: Override runtime metadata
-- **WHEN** an application supplies a runtime or engine name and version
-- **THEN** tracked events contain those supplied values in `engineName` and `engineVersion`
+#### Scenario: Omit WebView metadata
+- **WHEN** a Rust application tracks an event
+- **THEN** the event `systemProps` do not include `engineName` or `engineVersion`
+
+### Requirement: Optional panic hooks
+The builder SHALL allow callers to install either a custom panic hook or a default panic hook. When a panic hook is installed, it SHALL enqueue panic information and then delegate to Rust's previous panic hook. If the panicking thread has an active Tokio runtime, the hook SHALL also make a best-effort delivery attempt using the Tokio-backed transport before delegation. Without an active Tokio runtime on the panicking thread, the hook SHALL leave the panic event queued in memory. The panic hook MUST NOT expose a public blocking flush API.
+
+#### Scenario: Install the default panic hook
+- **WHEN** a caller enables the default panic hook
+- **THEN** a panic event is enqueued with panic message and source location information before the previous panic hook runs
+
+#### Scenario: Install a custom panic hook
+- **WHEN** a caller provides a custom panic hook
+- **THEN** the hook receives the client, panic information, and extracted panic message so it can enqueue an application-specific panic event

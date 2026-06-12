@@ -1,20 +1,19 @@
 [package]
 name = "aptabase-rs"
-version = "1.0.0"
+version = "0.1.0"
+authors = ["Eugén Cowie"]
+edition = "2024"
+description = "Rust SDK for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
+homepage = "https://github.com/eugencowie/aptabase-rs"
+repository = "https://github.com/eugencowie/aptabase-rs"
 license = "MIT"
-description = "Aptabase analytics client for Rust applications"
-authors = ["Guilherme Oenning"]
-edition = "2021"
-rust-version = "1.70"
-readme = "README.md"
-repository = "https://github.com/aptabase/aptabase-rs"
-homepage = "https://aptabase.com"
 keywords = ["analytics", "aptabase", "telemetry"]
 categories = ["api-bindings"]
-exclude = ["/openspec", "/AGENTS.md", "/mise.toml", "/mise.lock", "/llms.txt"]
 
 [dependencies]
-tokio = { version = "1.43.0", features = ["rt", "time"] }
+tokio = "1.43.0"
+futures = "0.3.31"
+serde = "1.0.217"
 serde_json = "1.0.138"
 reqwest = { version = "0.12.12", features = ["json"] }
 time = { version = "0.3.37", features = ["formatting"] }
@@ -22,6 +21,3 @@ os_info = "3.9.2"
 rand = "0.9.0"
 log = "0.4.25"
 sys-locale = "0.3.2"
-
-[dev-dependencies]
-tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread", "time"] }

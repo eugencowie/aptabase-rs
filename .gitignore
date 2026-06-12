@@ -21,6 +21,13 @@ target
 rustc-ice-*.txt
 
 #
+# https://www.toptal.com/developers/gitignore/api/dotenv
+#
+
+### dotenv ###
+.env
+
+#
 # https://github.com/github/gitignore/blob/main/Global/mise.gitignore
 #
 
