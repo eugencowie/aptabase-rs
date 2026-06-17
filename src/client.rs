@@ -1,11 +1,11 @@
 use rand::Rng;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{
     sync::{Arc, Mutex as SyncMutex},
     time::Duration,
 };
-use time::{format_description::well_known::Rfc3339, OffsetDateTime};
+use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
 use crate::{
     config::Config,
@@ -56,7 +56,7 @@ pub struct AptabaseClient {
 
 impl AptabaseClient {
     /// Creates a new Aptabase client.
-    pub fn new(config: &Config, app_version: String) -> Self {
+    pub(crate) fn new(config: &Config, app_version: String) -> Self {
         let sys_info = sys::get_info();
 
         let is_enabled = !config.app_key.is_empty();
@@ -121,8 +121,6 @@ impl AptabaseClient {
                 "osName": self.sys_info.os_name,
                 "osVersion": self.sys_info.os_version,
                 "locale": self.sys_info.locale,
-                "engineName": self.sys_info.engine_name,
-                "engineVersion": self.sys_info.engine_version,
                 "appVersion": self.app_version,
                 "sdkVersion": concat!(env!("CARGO_PKG_NAME"), "@", env!("CARGO_PKG_VERSION"))
             },
@@ -140,7 +138,7 @@ impl AptabaseClient {
     }
 
     /// Flushes the event queue, blocking the current thread.
-    pub fn flush_blocking(&self) {
+    pub(crate) fn flush_blocking(&self) {
         futures::executor::block_on(async {
             self.flush().await;
         });

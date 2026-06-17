@@ -7,10 +7,10 @@ use std::{
 
 use log::{debug, trace};
 use reqwest::{
-    header::{HeaderMap, HeaderValue},
     Url,
+    header::{HeaderMap, HeaderValue},
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::{config::Config, sys::SystemProperties};
 
@@ -30,10 +30,7 @@ impl EventDispatcher {
         headers.insert("App-Key", app_key_header);
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
 
-        let user_agent = format!(
-            "{}/{} {}/{} {}",
-            sys.os_name, sys.os_version, sys.engine_name, sys.engine_version, sys.locale
-        );
+        let user_agent = format!("{}/{} {}", sys.os_name, sys.os_version, sys.locale);
         let http_client = reqwest::Client::builder()
             .timeout(HTTP_REQUEST_TIMEOUT)
             .default_headers(headers)

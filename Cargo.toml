@@ -1,18 +1,16 @@
 [package]
-name = "tauri-plugin-aptabase"
-version = "1.0.0"
+name = "aptabase-rs"
+version = "0.1.0"
+authors = ["Eugén Cowie"]
+edition = "2024"
+description = "Rust SDK for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
+homepage = "https://github.com/eugencowie/aptabase-rs"
+repository = "https://github.com/eugencowie/aptabase-rs"
 license = "MIT"
-description = "Tauri Plugin for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
-authors = ["Guilherme Oenning"]
-edition = "2021"
-rust-version = "1.70"
-readme = "README.md"
-repository = "https://github.com/aptabase/tauri-plugin-aptabase"
-exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
-links = "tauri-plugin-aptabase"
+keywords = ["analytics", "aptabase", "telemetry"]
+categories = ["api-bindings"]
 
 [dependencies]
-tauri = "2.2.5"
 tokio = "1.43.0"
 futures = "0.3.31"
 serde = "1.0.217"
@@ -23,6 +21,3 @@ os_info = "3.9.2"
 rand = "0.9.0"
 log = "0.4.25"
 sys-locale = "0.3.2"
-
-[build-dependencies]
-tauri-plugin = { version = "2.0.4", features = ["build"] }
