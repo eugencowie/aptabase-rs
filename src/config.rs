@@ -43,7 +43,9 @@ impl Config {
                 if let Some(host) = opts.host {
                     host
                 } else {
-                    debug!("Host parameter must be defined when using Self-Hosted App Key. Tracking will be disabled.");
+                    debug!(
+                        "Host parameter must be defined when using Self-Hosted App Key. Tracking will be disabled."
+                    );
                     return Config::default();
                 }
             }
