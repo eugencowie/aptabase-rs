@@ -149,7 +149,6 @@ let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
         );
     }))
     .build();
-# let _ = client;
 ```
 
 ## Delivery behavior
