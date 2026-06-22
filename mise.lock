@@ -4,6 +4,14 @@
 version = "1.7.12"
 backend = "aqua:rhysd/actionlint"
 
+[[tools.gh]]
+version = "2.93.0"
+backend = "aqua:cli/cli"
+
+[[tools.git-cliff]]
+version = "2.13.1"
+backend = "aqua:orhun/git-cliff"
+
 [[tools.node]]
 version = "26.2.0"
 backend = "core:node"
@@ -39,6 +47,10 @@ url = "https://nodejs.org/dist/v26.2.0/node-v26.2.0-win-x64.zip"
 [[tools."npm:@fission-ai/openspec"]]
 version = "1.3.1"
 backend = "npm:@fission-ai/openspec"
+
+[[tools.release-plz]]
+version = "0.3.158"
+backend = "aqua:release-plz/release-plz"
 
 [[tools.rust]]
 version = "stable"
