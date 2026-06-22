@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix release workflow ([#5](https://github.com/eugencowie/aptabase-rs/pull/5))
+
 ## 0.1.0
 
 ### 🚀 Features
