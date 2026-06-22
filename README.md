@@ -27,7 +27,9 @@ Then create the client with your app key and application version:
 `src/main.rs`
 
 ```rust
-let client = aptabase_rs::Builder::new(
+use aptabase_rs::Builder;
+
+let client = Builder::new(
     "<YOUR_APP_KEY>", // 👈 this is where you enter your App Key
     env!("CARGO_PKG_VERSION"),
 )
@@ -92,7 +94,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 Calling `track_event` only enqueues events to be sent to the server, you need to explicitly await `flush` to actually send the queued events. For short-lived applications, this would typically be done at the end of the application's lifecycle.
 
-Long-running applications can opt in to periodic flushing with `with_polling(true)`. The interval defaults to 60 seconds in release builds and 2 seconds in debug builds. This can be customized with `with_options(InitOptions)`. It is important that you still flush manually before the applcation exits, so any unsent events are sent to the server.
+Long-running applications can opt in to periodic flushing with `with_polling(true)`. The interval defaults to 60 seconds in release builds and 2 seconds in debug builds. This can be customized with `with_options(InitOptions)`. It is important that you still flush manually before the applcation exits, so that any remaining events in the queue are sent to the server.
 
 ```rust
 use aptabase_rs::{Builder, InitOptions};
@@ -118,15 +120,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 ## Panic hook
 
-You can use the default panic hook to enqueue a `panic` event before the process continues to the default panic handler. If the panicking thread has an active Tokio runtime, the hook makes a best-effort delivery attempt with the same Tokio-backed transport. Without an active Tokio runtime on that thread, the panic event is only enqueued in memory before the previous panic hook runs. Applications that need predictable shutdown delivery should still call `flush().await` from normal control flow.
+You can use the default panic hook to enqueue a `panic` event before the process continues to the default panic handler. If the panicking thread has an active Tokio runtime, the hook makes a best-effort delivery attempt with the same Tokio-backed transport. Without an active Tokio runtime on that thread, the panic event is only enqueued in memory before the previous panic hook runs.
 
 ```rust
 use aptabase_rs::Builder;
 
-let client = Builder::new("A-EU-your-app-key", env!("CARGO_PKG_VERSION"))
+let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
     .with_default_panic_hook()
     .build();
-# let _ = client;
 ```
 
 For custom panic event payloads, provide your own hook:
@@ -135,7 +136,7 @@ For custom panic event payloads, provide your own hook:
 use aptabase_rs::Builder;
 use serde_json::json;
 
-let client = Builder::new("A-EU-your-app-key", env!("CARGO_PKG_VERSION"))
+let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
     .with_panic_hook(Box::new(|client, info, message| {
         let location = info
             .location()

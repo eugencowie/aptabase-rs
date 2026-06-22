@@ -70,15 +70,15 @@ impl Builder {
 
     /// Enables the default panic hook.
     pub fn with_default_panic_hook(self) -> Self {
-        self.with_panic_hook(Box::new(|client, info, msg| {
+        self.with_panic_hook(Box::new(|client, info, message| {
             let location = info
                 .location()
                 .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
-                .unwrap_or_else(|| "".to_string());
+                .unwrap_or_default();
             let _ = client.track_event(
                 "panic",
                 Some(json!({
-                    "info": format!("{} ({})", msg, location),
+                    "info": format!("{} ({})", message, location),
                 })),
             );
         }))
