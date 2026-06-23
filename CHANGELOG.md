@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+
+### 🐛 Bug Fixes
+
+- Fix build error in example ([#7](https://github.com/eugencowie/aptabase-rs/pull/7))
+
+### 📚 Documentation
+
+- Tidy up readme ([#9](https://github.com/eugencowie/aptabase-rs/pull/9))
+
 ## 0.1.1
 
 ### ⚙️ Miscellaneous Tasks
