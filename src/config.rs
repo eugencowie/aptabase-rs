@@ -8,6 +8,7 @@ use crate::InitOptions;
 #[derive(Debug, Clone)]
 pub struct Config {
     pub app_key: String,
+    pub session_id: Option<String>,
     pub ingest_api_url: Url,
     pub flush_interval: Duration,
 }
@@ -25,7 +26,7 @@ static DEFAULT_FLUSH_INTERVAL: Duration = Duration::from_secs(2);
 const VALID_REGIONS: &[&str] = &["US", "EU", "DEV", "SH"];
 
 impl Config {
-    pub fn new(app_key: String, opts: InitOptions) -> Self {
+    pub fn new(app_key: String, session_id: Option<String>, opts: InitOptions) -> Self {
         let parts = app_key.split("-").collect::<Vec<&str>>();
         if parts.len() != 3 || !VALID_REGIONS.contains(&parts[1]) {
             debug!(
@@ -54,6 +55,7 @@ impl Config {
 
         Self {
             app_key,
+            session_id,
             ingest_api_url: format!("{}/api/v0/events", base_url).parse().unwrap(),
             flush_interval: opts.flush_interval.unwrap_or(DEFAULT_FLUSH_INTERVAL),
         }
@@ -64,6 +66,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             app_key: String::new(),
+            session_id: None,
             ingest_api_url: Url::parse(LOCAL).unwrap(),
             flush_interval: DEFAULT_FLUSH_INTERVAL,
         }

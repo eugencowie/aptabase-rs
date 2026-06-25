@@ -15,7 +15,7 @@ use crate::{
 
 static SESSION_TIMEOUT: Duration = Duration::from_secs(4 * 60 * 60);
 
-fn new_session_id() -> String {
+pub fn new_session_id() -> String {
     let epoch_in_seconds = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("time went backwards")
@@ -37,9 +37,11 @@ pub struct TrackingSession {
 }
 
 impl TrackingSession {
-    fn new() -> Self {
+    fn new(id: Option<String>) -> Self {
         Self {
-            id: new_session_id(),
+            id: id
+                .filter(|id| !id.is_empty())
+                .unwrap_or_else(new_session_id),
             last_touch_ts: OffsetDateTime::now_utc(),
         }
     }
@@ -65,7 +67,7 @@ impl AptabaseClient {
         Self {
             is_enabled,
             dispatcher,
-            session: SyncMutex::new(TrackingSession::new()),
+            session: SyncMutex::new(TrackingSession::new(config.session_id.clone())),
             app_version,
             sys_info,
         }
@@ -89,7 +91,7 @@ impl AptabaseClient {
 
         let now = OffsetDateTime::now_utc();
         if (now - session.last_touch_ts) > SESSION_TIMEOUT {
-            *session = TrackingSession::new();
+            *session = TrackingSession::new(None);
         } else {
             session.last_touch_ts = now;
         }
@@ -141,5 +143,19 @@ impl AptabaseClient {
         futures::executor::block_on(async {
             self.flush().await;
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_session_id_is_not_empty() {
+        // Act
+        let session_id = new_session_id();
+
+        // Assert
+        assert!(!session_id.is_empty());
     }
 }

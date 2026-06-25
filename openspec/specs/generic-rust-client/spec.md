@@ -1,7 +1,7 @@
 # generic-rust-client Specification
 
 ## Purpose
-Define the framework-independent Rust SDK for constructing an Aptabase client, enqueueing analytics events, managing sessions and metadata, selecting hosted or self-hosted endpoints, and delivering queued events through Tokio-based batching and flushing.
+Define the framework-independent Rust SDK surface created by extracting the existing `tauri-plugin-aptabase` client behavior for use by generic Rust applications. This covers construction, event enqueueing, baseline session lifecycle, metadata, hosted or self-hosted endpoint selection, and Tokio-based batching and flushing.
 
 ## Requirements
 ### Requirement: In-place generic crate replacement
