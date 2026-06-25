@@ -5,7 +5,7 @@ mod sys;
 
 use std::{panic::PanicHookInfo, sync::Arc, time::Duration};
 
-pub use client::AptabaseClient;
+pub use client::{AptabaseClient, new_session_id};
 use config::Config;
 use serde_json::json;
 
@@ -19,6 +19,7 @@ pub struct InitOptions {
 pub struct Builder {
     app_key: String,
     app_version: String,
+    session_id: Option<String>,
     enable_polling: bool,
     panic_hook: Option<PanicHook>,
     options: InitOptions,
@@ -44,6 +45,7 @@ impl Builder {
         Self {
             app_key: app_key.into(),
             app_version: app_version.into(),
+            session_id: None,
             enable_polling: false,
             panic_hook: None,
             options: Default::default(),
@@ -53,6 +55,12 @@ impl Builder {
     /// Sets custom options to use for the Aptabase client.
     pub fn with_options(mut self, opts: InitOptions) -> Self {
         self.options = opts;
+        self
+    }
+
+    /// Sets the initial session ID.
+    pub fn with_session_id(mut self, session_id: impl Into<String>) -> Self {
+        self.session_id = Some(session_id.into());
         self
     }
 
@@ -86,7 +94,7 @@ impl Builder {
 
     /// Builds and initializes the client
     pub fn build(self) -> Arc<AptabaseClient> {
-        let cfg = Config::new(self.app_key, self.options);
+        let cfg = Config::new(self.app_key, self.session_id, self.options);
         let client = Arc::new(AptabaseClient::new(&cfg, self.app_version));
 
         if self.enable_polling {
@@ -105,5 +113,32 @@ impl Builder {
         }
 
         client
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builder_uses_supplied_session_id() {
+        // Act
+        let client = Builder::new("A-DEV-123", "test")
+            .with_session_id("persisted-session")
+            .build();
+
+        // Assert
+        assert_eq!(client.eval_session_id(), "persisted-session");
+    }
+
+    #[test]
+    fn builder_treats_empty_session_id_as_absent() {
+        // Act
+        let client = Builder::new("A-DEV-123", "test")
+            .with_session_id("")
+            .build();
+
+        // Assert
+        assert!(!client.eval_session_id().is_empty());
     }
 }
