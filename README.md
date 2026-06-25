@@ -90,6 +90,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
+## Persisting sessions
+
+By default, the SDK generates an in-memory session ID which rotates every 4 hours or whenever the app restarts. Applications which start and exit frequently may want to persist the session ID to disk so it can be reused across restarts.
+
+To implement persistent sessions, generate a new session ID with `aptabase_rs::new_session_id()` and persist it to your application's storage (file, database, etc.). This can be loaded at startup and passed to the builder with `Builder::with_session_id()`. When you do this, your application is responsible for rotating the persisted session ID; if it keeps reusing the same stored ID, those runs will be grouped into the same session.
+
+```rust
+use aptabase_rs::Builder;
+use std::fs;
+
+let session_path = "aptabase-session-id";
+let session_id = fs::read_to_string(session_path).unwrap_or_else(|_| {
+    let id = aptabase_rs::new_session_id();
+    fs::write(session_path, &id).expect("failed to persist Aptabase session ID");
+    id
+});
+
+let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
+    .with_session_id(session_id)
+    .build();
+```
+
 ## Periodic flushing
 
 Calling `track_event` only enqueues events to be sent to the server, you need to explicitly await `flush` to actually send the queued events. For short-lived applications, this would typically be done at the end of the application's lifecycle.
