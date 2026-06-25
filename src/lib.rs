@@ -139,6 +139,6 @@ mod tests {
             .build();
 
         // Assert
-        assert!(client.eval_session_id().is_empty());
+        assert!(!client.eval_session_id().is_empty());
     }
 }
