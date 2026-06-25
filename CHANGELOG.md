@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+### 🚀 Features
+
+- Add custom session ID support ([#10](https://github.com/eugencowie/aptabase-rs/pull/10))
+
 ## 0.1.2
 
 ### 🐛 Bug Fixes
