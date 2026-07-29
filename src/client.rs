@@ -1,11 +1,11 @@
 use rand::Rng;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{
     sync::{Arc, Mutex as SyncMutex},
     time::Duration,
 };
-use time::{OffsetDateTime, format_description::well_known::Rfc3339};
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 use crate::{
     config::Config,
