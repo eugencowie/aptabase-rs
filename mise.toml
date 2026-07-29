@@ -4,8 +4,17 @@ gh = "latest"
 git-cliff = "latest"
 node = "latest"
 "npm:@fission-ai/openspec" = "latest"
+"npm:skills" = "latest"
 release-plz = "latest"
 rust = "stable"
+
+[tasks.init]
+description = "Initialise development environment"
+run = [
+  "skills experimental_install",
+  "cp -r .agents/. .claude",
+  "echo @AGENTS.md > CLAUDE.md"
+]
 
 [tasks.test]
 description = "Run tests"

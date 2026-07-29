@@ -1,14 +1,17 @@
 ---
 disclosure-default: ai-assisted
-models-used: [gpt-5.5]
-providers: [OpenAI]
+models-used:
+  - gpt-5.5
+  - gpt-5.6-sol
+providers:
+  - OpenAI
 scope: |
   Specifications are typically AI-generated with manual review.
   Code is typically AI-assisted.
   Tests are typically AI-generated.
   Documentation is typically human-written.
   Upstream project has no AI disclosure.
-last-updated: 2026-06-01
+last-updated: 2026-07-01
 ---
 
 # AI Disclosure

@@ -167,6 +167,10 @@ url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-win-x64.zip"
 version = "1.7.0"
 backend = "npm:@fission-ai/openspec"
 
+[[tools."npm:skills"]]
+version = "1.5.20"
+backend = "npm:skills"
+
 [[tools.release-plz]]
 version = "0.3.160"
 backend = "aqua:release-plz/release-plz"
