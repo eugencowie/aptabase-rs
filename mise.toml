@@ -7,12 +7,30 @@ node = "latest"
 release-plz = "latest"
 rust = "stable"
 
-[tasks]
-format = "cargo fmt"
-lint = "cargo clippy --all-targets"
-test = "cargo test"
-changelog = "git cliff --bump"
-release = "release-plz update"
+[tasks.test]
+description = "Run tests"
+run = "cargo test"
 
-[tasks.ci]
-depends = ["format --check", "lint", "test"]
+[tasks.format]
+description = "Fix formatting issues"
+run = "cargo fmt"
+
+[tasks.lint]
+description = "Fix linting issues"
+run = "cargo clippy --all-targets --fix --allow-dirty"
+
+[tasks.check]
+description = "Check formatting/linting/tests"
+run = [
+  "cargo fmt --check",
+  "cargo clippy --all-targets",
+  "cargo test"
+]
+
+[tasks.changelog]
+description = "Update changelog"
+run = "git cliff --bump"
+
+[tasks.release]
+description = "Perform release process locally"
+run = "release-plz update"
