@@ -1,3 +1,5 @@
+pub(crate) mod session;
+
 use rand::Rng;
 use serde_json::{json, Value};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -15,7 +17,7 @@ use crate::{
 
 static SESSION_TIMEOUT: Duration = Duration::from_secs(4 * 60 * 60);
 
-pub fn new_session_id() -> String {
+fn new_session_id() -> String {
     let epoch_in_seconds = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("time went backwards")
@@ -37,11 +39,9 @@ pub struct TrackingSession {
 }
 
 impl TrackingSession {
-    fn new(id: Option<String>) -> Self {
+    fn new() -> Self {
         Self {
-            id: id
-                .filter(|id| !id.is_empty())
-                .unwrap_or_else(new_session_id),
+            id: new_session_id(),
             last_touch_ts: OffsetDateTime::now_utc(),
         }
     }
@@ -58,7 +58,7 @@ pub struct AptabaseClient {
 
 impl AptabaseClient {
     /// Creates a new Aptabase client.
-    pub(crate) fn new(config: &Config, app_version: String) -> Self {
+    pub fn new(config: &Config, app_version: String) -> Self {
         let sys_info = sys::get_info();
 
         let is_enabled = !config.app_key.is_empty();
@@ -67,7 +67,7 @@ impl AptabaseClient {
         Self {
             is_enabled,
             dispatcher,
-            session: SyncMutex::new(TrackingSession::new(config.session_id.clone())),
+            session: SyncMutex::new(TrackingSession::new()),
             app_version,
             sys_info,
         }
@@ -91,7 +91,7 @@ impl AptabaseClient {
 
         let now = OffsetDateTime::now_utc();
         if (now - session.last_touch_ts) > SESSION_TIMEOUT {
-            *session = TrackingSession::new(None);
+            *session = TrackingSession::new();
         } else {
             session.last_touch_ts = now;
         }
@@ -144,19 +144,5 @@ impl AptabaseClient {
         futures::executor::block_on(async {
             self.flush().await;
         });
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_session_id_is_not_empty() {
-        // Act
-        let session_id = new_session_id();
-
-        // Assert
-        assert!(!session_id.is_empty());
     }
 }
