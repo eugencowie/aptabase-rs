@@ -26,4 +26,6 @@ sys-locale = "0.3.2"
 warnings = "deny"
 
 [lints.clippy]
-all = "deny"
+all = { level = "deny", priority = -1 }
+collapsible_if = "allow" # match upstream
+to_string_in_format_args = "allow" # match upstream

@@ -105,12 +105,13 @@ impl AptabaseClient {
             return Ok(());
         }
 
-        if let Some(props) = &props
-            && !matches!(props, Value::Object(_))
-        {
-            return Err(
-                "props must be `None` or the `Object` variation of `serde_json::Value`".to_owned(),
-            );
+        if let Some(props) = &props {
+            if !matches!(props, Value::Object(_)) {
+                return Err(
+                    "props must be `None` or the `Object` variation of `serde_json::Value`"
+                        .to_owned(),
+                );
+            }
         }
 
         let ev = json!({
