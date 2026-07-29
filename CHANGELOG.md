@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### ⚙️ Miscellaneous Tasks
+
+- Run CI and releases from main ([#12](https://github.com/eugencowie/aptabase-rs/pull/12))
+
 ## 0.2.0
 
 ### 🚀 Features
