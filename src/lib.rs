@@ -6,7 +6,7 @@ mod sys;
 
 use std::{panic::PanicHookInfo, sync::Arc, time::Duration};
 
-pub use client::{new_session_id, AptabaseClient};
+pub use client::{session::new_session_id, AptabaseClient};
 use config::Config;
 
 #[derive(Default, Debug, Clone)]
@@ -66,8 +66,9 @@ impl Builder {
 
     /// Builds and initializes the client
     pub fn build(self) -> Arc<AptabaseClient> {
-        let cfg = Config::new(self.app_key, self.session_id, self.options);
+        let cfg = Config::new(self.app_key, self.options);
         let client = Arc::new(AptabaseClient::new(&cfg, self.app_version));
+        client.seed_session_id(self.session_id);
 
         if self.enable_polling {
             client.start_polling(cfg.flush_interval);

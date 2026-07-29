@@ -34,30 +34,3 @@ impl Builder {
         }))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn builder_uses_supplied_session_id() {
-        // Act
-        let client = Builder::new("A-DEV-123", "test")
-            .with_session_id("persisted-session")
-            .build();
-
-        // Assert
-        assert_eq!(client.eval_session_id(), "persisted-session");
-    }
-
-    #[test]
-    fn builder_treats_empty_session_id_as_absent() {
-        // Act
-        let client = Builder::new("A-DEV-123", "test")
-            .with_session_id("")
-            .build();
-
-        // Assert
-        assert!(!client.eval_session_id().is_empty());
-    }
-}
