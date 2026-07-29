@@ -41,5 +41,5 @@ description = "Update changelog"
 run = "git cliff --bump"
 
 [tasks.release]
-description = "Perform release process locally"
+description = "Update release versions and changelogs locally"
 run = "release-plz update"
