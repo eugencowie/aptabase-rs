@@ -44,6 +44,10 @@ jobs:
     steps:
       - *checkout
       - *install-rust
+      # Keep in sync with the changelog task in mise.toml.
+      - name: Skip commits off the first-parent chain
+        shell: bash
+        run: comm -23 <(git rev-list HEAD | sort) <(git rev-list --first-parent HEAD | sort) > .cliffignore
       - name: Generate changelog
         id: git-cliff
         uses: orhun/git-cliff-action@v4
