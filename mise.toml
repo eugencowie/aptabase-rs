@@ -27,7 +27,12 @@ run = [
 
 [tasks.changelog]
 description = "Update changelog"
-run = "git cliff --bump"
+shell = "bash -c"
+run = [
+  # Skip commits off main's first-parent chain (branch and upstream commits)
+  "comm -23 <(git rev-list HEAD | sort) <(git rev-list --first-parent HEAD | sort) > .cliffignore",
+  "git cliff --bump"
+]
 
 [tasks.release]
 description = "Update release versions and changelogs locally"
