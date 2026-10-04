@@ -1,9 +1,8 @@
-> [!NOTE]
-> This project is not affiliated with Aptabase or Sumbit Labs Ltd.
-
 # Rust SDK for Aptabase
 
-`aptabase-rs` is a framework-independent Rust SDK for Aptabase, an Open Source, Privacy-First, and Simple Analytics for Mobile, Desktop, and Web Apps.
+An unofficial, framework-independent Rust SDK for [Aptabase](https://aptabase.com), the open source, privacy-first, and simple analytics platform for mobile, desktop and web apps.
+
+This is a community project and is not affiliated with or endorsed by Aptabase. It is derived from the official [`tauri-plugin-aptabase`](https://github.com/aptabase/tauri-plugin-aptabase). If you're building a Tauri app, use that instead.
 
 ## Install
 
