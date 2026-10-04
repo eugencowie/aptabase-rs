@@ -2,7 +2,7 @@
 
 An unofficial, framework-independent Rust SDK for [Aptabase](https://aptabase.com), the open source, privacy-first, and simple analytics platform for mobile, desktop and web apps.
 
-This is a community project and is not affiliated with or endorsed by Aptabase. It is derived from the official [`tauri-plugin-aptabase`](https://github.com/aptabase/tauri-plugin-aptabase). If you're building a Tauri app, use that instead.
+This is a community project and is not affiliated with or endorsed by Aptabase. It is derived from the official [Tauri Plugin for Aptabase](https://github.com/aptabase/tauri-plugin-aptabase). If you're building a Tauri app, use that instead.
 
 ## Install
 
