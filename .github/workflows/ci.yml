@@ -16,3 +16,36 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets
       - run: cargo test
+
+  features:
+    name: Clippy (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: native-tls
+            flags: --no-default-features --features native-tls
+          - name: rustls-tls
+            flags: --no-default-features --features rustls-tls
+          - name: no TLS
+            flags: --no-default-features
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --all-targets ${{ matrix.flags }}
+
+  example:
+    name: Example
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/helloworld
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: examples/helloworld
+      - run: cp .env.example .env
+      - run: cargo clippy --all-targets --locked
