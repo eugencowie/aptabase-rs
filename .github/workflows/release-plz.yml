@@ -23,8 +23,7 @@ jobs:
       - &install-rust
         name: Install Rust toolchain
         uses: jdx/mise-action@v5
-        with:
-          install_args: rust
+        with: { install_args: rust }
       - name: Run release-plz
         uses: release-plz/action@v0.5
         with:
