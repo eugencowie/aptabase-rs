@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0
+
+### 🚀 Features
+
+- **BREAKING CHANGE**: Switch default TLS backend to rustls ([#16](https://github.com/eugencowie/aptabase-rs/pull/16))
+
+### 📚 Documentation
+
+- Remove specs and skills from repo ([#14](https://github.com/eugencowie/aptabase-rs/pull/14))
+
+### ⚙️ Miscellaneous Tasks
+
+- Run CI and releases from main ([#12](https://github.com/eugencowie/aptabase-rs/pull/12))
+- Merge upstream changes ([#15](https://github.com/eugencowie/aptabase-rs/pull/15))
+
 ## 0.2.0
 
 ### 🚀 Features
