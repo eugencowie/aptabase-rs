@@ -2,7 +2,8 @@
 name = "aptabase-rs"
 version = "0.3.0"
 authors = ["Eugén Cowie"]
-edition = "2024"
+edition = "2021"
+resolver = "3"
 description = "Rust SDK for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
 homepage = "https://github.com/eugencowie/aptabase-rs"
 repository = "https://github.com/eugencowie/aptabase-rs"
