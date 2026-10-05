@@ -28,6 +28,14 @@ rustc-ice-*.txt
 .env
 
 #
+# Examples
+#
+
+# Each example builds against the local crate, so a committed lockfile
+# only goes stale whenever the crate's version changes
+examples/*/Cargo.lock
+
+#
 # git-cliff
 #
 
