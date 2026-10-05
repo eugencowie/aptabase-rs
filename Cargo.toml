@@ -36,3 +36,4 @@ warnings = "deny"
 [lints.clippy]
 all = { level = "deny", priority = -1 }
 to_string_in_format_args = "allow" # match upstream
+uninlined_format_args = "allow" # match upstream
