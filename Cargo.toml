@@ -33,4 +33,5 @@ rustls-tls = ["reqwest/rustls"]
 warnings = "deny"
 
 [lints.clippy]
-all = "deny"
+all = { level = "deny", priority = -1 }
+to_string_in_format_args = "allow" # match upstream
