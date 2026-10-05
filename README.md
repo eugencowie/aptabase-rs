@@ -17,25 +17,6 @@ serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
-### TLS backends
-
-The SDK uses [`reqwest`](https://crates.io/crates/reqwest) to send events, and you can choose its TLS backend with Cargo features:
-
-| Feature | Backend |
-| --- | --- |
-| `default-tls` (default) | `reqwest`'s default backend, currently `rustls` |
-| `rustls-tls` | `rustls` |
-| `native-tls` | The platform's native TLS library (OpenSSL on Linux) |
-
-To switch backend, disable the default features:
-
-```toml
-[dependencies]
-aptabase-rs = { version = "0.3", default-features = false, features = ["native-tls"] }
-```
-
-Without any TLS feature, the SDK can only send events over plain HTTP. That works with `DEV` app keys, which send to `http://localhost:3000`, and with self-hosted servers on an `http://` host. Events sent to an `https://` host fail and are only logged at `debug` level.
-
 ## Usage
 
 First, you need to get your `App Key` from Aptabase, you can find it in the `Instructions` menu on the left side menu.
@@ -197,6 +178,25 @@ let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
 - Transport failures and HTTP 5xx responses are requeued in memory for a later flush.
 - Other unsuccessful HTTP responses are discarded.
 - This crate provides only the asynchronous Tokio transport; it does not expose a blocking flush API.
+
+## TLS backends
+
+The SDK uses [`reqwest`](https://crates.io/crates/reqwest) to send events, and you can choose its TLS backend with Cargo features:
+
+| Feature | Backend |
+| --- | --- |
+| `default-tls` (default) | `reqwest`'s default backend, currently `rustls` |
+| `rustls-tls` | `rustls` |
+| `native-tls` | The platform's native TLS library (OpenSSL on Linux) |
+
+To switch backend, disable the default features:
+
+```toml
+[dependencies]
+aptabase-rs = { version = "0.3", default-features = false, features = ["native-tls"] }
+```
+
+Without any TLS feature, the SDK can only send events over plain HTTP. That works with `DEV` app keys, which send to `http://localhost:3000`, and with self-hosted servers on an `http://` host. Events sent to an `https://` host fail and are only logged at `debug` level.
 
 ## Privacy
 
