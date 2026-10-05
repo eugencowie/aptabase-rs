@@ -1,3 +1,4 @@
+mod builder_ext;
 mod client;
 mod config;
 mod dispatcher;
@@ -5,9 +6,8 @@ mod sys;
 
 use std::{panic::PanicHookInfo, sync::Arc, time::Duration};
 
-pub use client::{new_session_id, AptabaseClient};
+pub use client::{session::new_session_id, AptabaseClient};
 use config::Config;
-use serde_json::json;
 
 #[derive(Default, Debug, Clone)]
 pub struct InitOptions {
@@ -58,44 +58,17 @@ impl Builder {
         self
     }
 
-    /// Sets the initial session ID.
-    pub fn with_session_id(mut self, session_id: impl Into<String>) -> Self {
-        self.session_id = Some(session_id.into());
-        self
-    }
-
-    /// Sets whether polling should be enabled.
-    pub fn with_polling(mut self, enable: bool) -> Self {
-        self.enable_polling = enable;
-        self
-    }
-
     /// Sets a custom panic hook.
     pub fn with_panic_hook(mut self, hook: PanicHook) -> Self {
         self.panic_hook = Some(hook);
         self
     }
 
-    /// Enables the default panic hook.
-    pub fn with_default_panic_hook(self) -> Self {
-        self.with_panic_hook(Box::new(|client, info, message| {
-            let location = info
-                .location()
-                .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
-                .unwrap_or_default();
-            let _ = client.track_event(
-                "panic",
-                Some(json!({
-                    "info": format!("{} ({})", message, location),
-                })),
-            );
-        }))
-    }
-
     /// Builds and initializes the client
     pub fn build(self) -> Arc<AptabaseClient> {
-        let cfg = Config::new(self.app_key, self.session_id, self.options);
+        let cfg = Config::new(self.app_key, self.options);
         let client = Arc::new(AptabaseClient::new(&cfg, self.app_version));
+        client.seed_session_id(self.session_id);
 
         if self.enable_polling {
             client.start_polling(cfg.flush_interval);
@@ -113,32 +86,5 @@ impl Builder {
         }
 
         client
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn builder_uses_supplied_session_id() {
-        // Act
-        let client = Builder::new("A-DEV-123", "test")
-            .with_session_id("persisted-session")
-            .build();
-
-        // Assert
-        assert_eq!(client.eval_session_id(), "persisted-session");
-    }
-
-    #[test]
-    fn builder_treats_empty_session_id_as_absent() {
-        // Act
-        let client = Builder::new("A-DEV-123", "test")
-            .with_session_id("")
-            .build();
-
-        // Assert
-        assert!(!client.eval_session_id().is_empty());
     }
 }
