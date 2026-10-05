@@ -7,10 +7,10 @@ use std::{
 
 use log::{debug, trace};
 use reqwest::{
-    Url,
     header::{HeaderMap, HeaderValue},
+    Url,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 use crate::{config::Config, sys::SystemProperties};
 
@@ -112,7 +112,7 @@ impl EventDispatcher {
                 },
                 Err(err) => {
                     failed_items.extend(events_to_send);
-                    debug!("failed to track_event: {}", err);
+                    debug!("failed to track_event: {}", err.to_string());
                 }
             }
         }

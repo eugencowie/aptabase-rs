@@ -1,12 +1,13 @@
 [package]
 name = "aptabase-rs"
 version = "0.3.0"
-authors = ["Eugén Cowie"]
-edition = "2024"
+license = "MIT"
 description = "Rust SDK for Aptabase: Open Source, Privacy-First and Simple Analytics for Mobile, Desktop and Web Apps"
+authors = ["Eugén Cowie"]
+edition = "2021"
+rust-version = "1.88"
 homepage = "https://github.com/eugencowie/aptabase-rs"
 repository = "https://github.com/eugencowie/aptabase-rs"
-license = "MIT"
 keywords = ["analytics", "aptabase", "telemetry"]
 categories = ["api-bindings"]
 
@@ -32,4 +33,6 @@ rustls-tls = ["reqwest/rustls"]
 warnings = "deny"
 
 [lints.clippy]
-all = "deny"
+all = { level = "deny", priority = -1 }
+to_string_in_format_args = "allow" # match upstream
+uninlined_format_args = "allow" # match upstream
