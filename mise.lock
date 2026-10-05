@@ -166,5 +166,8 @@ url = "https://github.com/release-plz/release-plz/releases/download/release-plz-
 url_api = "https://api.github.com/repos/release-plz/release-plz/releases/assets/476459873"
 
 [[tools.rust]]
-version = "stable"
+version = "1.88.0"
 backend = "core:rust"
+
+[tools.rust.options]
+components = "clippy,rustfmt"

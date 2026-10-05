@@ -5,7 +5,7 @@ mod sys;
 
 use std::{panic::PanicHookInfo, sync::Arc, time::Duration};
 
-pub use client::{AptabaseClient, new_session_id};
+pub use client::{new_session_id, AptabaseClient};
 use config::Config;
 use serde_json::json;
 

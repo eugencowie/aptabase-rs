@@ -11,11 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: jdx/mise-action@v5
+        with: { install_args: rust }
       - uses: Swatinem/rust-cache@v2
-      - run: cargo fmt --check
-      - run: cargo clippy --all-targets
-      - run: cargo test
+      - run: mise run check
 
   features:
     name: Clippy (${{ matrix.name }})
@@ -31,7 +30,8 @@ jobs:
             flags: --no-default-features
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: jdx/mise-action@v5
+        with: { install_args: rust }
       - uses: Swatinem/rust-cache@v2
       - run: cargo clippy --all-targets ${{ matrix.flags }}
 
@@ -43,9 +43,9 @@ jobs:
         working-directory: examples/helloworld
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: jdx/mise-action@v5
+        with: { install_args: rust }
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: examples/helloworld
+        with: { workspaces: examples/helloworld }
       - run: cp .env.example .env
       - run: cargo clippy --all-targets

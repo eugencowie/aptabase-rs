@@ -1,11 +1,11 @@
 use rand::RngExt;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{
     sync::{Arc, Mutex as SyncMutex},
     time::Duration,
 };
-use time::{OffsetDateTime, format_description::well_known::Rfc3339};
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 use crate::{
     config::Config,
@@ -105,12 +105,13 @@ impl AptabaseClient {
             return Ok(());
         }
 
-        if let Some(props) = &props
-            && !matches!(props, Value::Object(_))
-        {
-            return Err(
-                "props must be `None` or the `Object` variation of `serde_json::Value`".to_owned(),
-            );
+        if let Some(props) = &props {
+            if !matches!(props, Value::Object(_)) {
+                return Err(
+                    "props must be `None` or the `Object` variation of `serde_json::Value`"
+                        .to_owned(),
+                );
+            }
         }
 
         let ev = json!({

@@ -3,7 +3,7 @@ actionlint = "latest"
 gh = "latest"
 git-cliff = "latest"
 release-plz = "latest"
-rust = "stable"
+rust = { version = "1.88", components = ["clippy", "rustfmt"] } # the MSRV
 
 [tasks.test]
 description = "Run tests"
@@ -20,6 +20,8 @@ run = "cargo clippy --all-targets --fix --allow-dirty"
 [tasks.check]
 description = "Check formatting/linting/tests"
 run = [
+  # Fail if the pinned toolchain has drifted from rust-version in Cargo.toml
+  'grep -q "^rust-version = \"$(rustc -V | cut -d" " -f2 | cut -d. -f1,2)\"" Cargo.toml',
   "cargo fmt --check",
   "cargo clippy --all-targets",
   "cargo test"
