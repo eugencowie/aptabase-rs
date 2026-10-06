@@ -24,7 +24,8 @@ jobs:
         name: Install tools
         id: mise
         uses: jdx/mise-action@v5
-        with: { install_args: rust release-plz git-cliff }
+        with:
+          install_args: rust release-plz git-cliff
       - name: Run release-plz
         uses: release-plz/action@v0.5
         with:
