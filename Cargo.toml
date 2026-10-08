@@ -23,6 +23,11 @@ rand = "0.10.0"
 log = "0.4.25"
 sys-locale = "0.3.2"
 
+[dev-dependencies]
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
+time = { version = "0.3.37", features = ["parsing"] }
+wiremock = "0.6.5"
+
 [features]
 default = ["default-tls"]
 default-tls = ["reqwest/default-tls"]
