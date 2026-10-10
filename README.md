@@ -91,7 +91,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 ## Persisting sessions
 
-By default, the SDK generates an in-memory session ID which rotates every 4 hours or whenever the app restarts. Applications which start and exit frequently may want to persist the session ID to disk so it can be reused across restarts.
+By default, the SDK generates an in-memory session ID which rotates after 4 hours of inactivity or whenever the app restarts. Applications which start and exit frequently may want to persist the session ID to disk so it can be reused across restarts.
 
 To implement persistent sessions, generate a new session ID with `aptabase_rs::new_session_id()` and persist it to your application's storage (file, database, etc.). This can be loaded at startup and passed to the builder with `Builder::with_session_id()`. When you do this, your application is responsible for rotating the persisted session ID; if it keeps reusing the same stored ID, those runs will be grouped into the same session.
 
