@@ -1,21 +1,16 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:best-practices", "schedule:weekly"],
+  extends: [
+    "config:best-practices",
+    "schedule:weekly",
+    "security:minimumReleaseAgeCrate",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+  ],
+  ignorePresets: [":pinDevDependencies"],
   labels: ["chore"],
-  semanticCommits: "enabled",
-  minimumReleaseAge: "7 days",
 
   packageRules: [
-    {
-      description: "Keep every update a chore(deps) commit, which git-cliff leaves out of the changelog",
-      matchPackageNames: ["*"],
-      semanticCommitType: "chore",
-    },
-    {
-      description: "This is a library, so leave Cargo.toml requirements alone and only bump Cargo.lock",
-      matchManagers: ["cargo"],
-      rangeStrategy: "update-lockfile",
-    },
     {
       description: "The Rust toolchain is pinned to the MSRV, so only bump it by hand",
       matchManagers: ["mise"],
