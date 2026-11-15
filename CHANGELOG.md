@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.0
+
+### 🚀 Features
+
+- Add error reporting (merge from upstream)
+
+### 🧪 Testing
+
+- Add delivery tests (merge from upstream)
+
+### ⚙️ Miscellaneous Tasks
+
+- Install only the tools each release job uses ([#34](https://github.com/eugencowie/aptabase-rs/pull/34))
+- Standardise workflow formatting ([#36](https://github.com/eugencowie/aptabase-rs/pull/36))
+- Regenerate mise.lock in lockfile format v3 ([#37](https://github.com/eugencowie/aptabase-rs/pull/37))
+- Drop personal-environment patterns from .gitignore ([#38](https://github.com/eugencowie/aptabase-rs/pull/38))
+- Standardise changelog generation ([#39](https://github.com/eugencowie/aptabase-rs/pull/39))
+- Fix repo link ([#40](https://github.com/eugencowie/aptabase-rs/pull/40))
+- Update agent instructions ([#41](https://github.com/eugencowie/aptabase-rs/pull/41))
+- Replace Dependabot with Renovate ([#54](https://github.com/eugencowie/aptabase-rs/pull/54))
+
 ## 0.3.1
 
 ### 🚜 Refactor
