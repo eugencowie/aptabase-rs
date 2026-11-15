@@ -18,6 +18,14 @@ _Avoid_: Environment, server
 A single named occurrence in the application, with optional custom properties, enriched by the SDK with the session, app version and system details.
 _Avoid_: Message, hit
 
+**Error report**:
+An error sent to the server's error endpoint, one per request: a handled error the application reports, or a panic captured by crash reporting. Unlike events, reports are sent right away when there is a Tokio runtime to send them on.
+_Avoid_: Exception, error event
+
+**Crash**:
+A panic that ends the application, reported as fatal and sent before the application exits, within three seconds.
+_Avoid_: Fatal error
+
 **Session**:
 A run of activity that groups events, identified by a session ID. It ends after 4 hours without events, and on application restart unless the application supplies a persisted session ID.
 _Avoid_: Visit

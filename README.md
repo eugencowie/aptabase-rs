@@ -141,7 +141,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 ## Panic hook
 
-You can use the default panic hook to enqueue a `panic` event before the process continues to the default panic handler. If the panicking thread has an active Tokio runtime, the hook makes a best-effort delivery attempt with the same Tokio-backed transport. Without an active Tokio runtime on that thread, the panic event is only enqueued in memory before the previous panic hook runs.
+You can use the default panic hook to track a `panic` event before the process continues to the previous panic hook. After the hook runs, the queued events are flushed on a thread and Tokio runtime of their own, so this works whether or not the panicking thread is inside a runtime. The flush waits at most 3 seconds.
 
 ```rust
 use aptabase_rs::Builder;
@@ -171,6 +171,44 @@ let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
     }))
     .build();
 ```
+
+## Error reporting
+
+> Error reporting is in beta. Reports appear on the `Errors` page of your Aptabase dashboard.
+
+Use `track_error` to report errors you've caught and handled. `ErrorReport::from_error` reports a Rust error with its type name and the errors that caused it:
+
+```rust
+use aptabase_rs::ErrorReport;
+
+if let Err(err) = std::fs::read_to_string("settings.json") {
+    client.track_error(ErrorReport::from_error(&err)); // severity: error
+}
+```
+
+For errors your app can't recover from, mark the report as fatal:
+
+```rust
+client.track_error(ErrorReport::from_error(&err).with_fatal(true)); // severity: fatal
+```
+
+To also report crashes automatically, enable crash reporting when you build the client:
+
+```rust
+use aptabase_rs::Builder;
+
+let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
+    .with_crash_reporting()
+    .build();
+```
+
+A few important notes about error reporting:
+
+1. Unlike events, a report tracked inside a Tokio runtime is sent right away. Outside one, it waits for the next flush. At most 25 reports wait to be sent; beyond that, new ones are dropped, except fatal ones.
+2. A panic on the main thread ends your app: it's reported as a fatal `crash`, and the app waits up to three seconds for the report to be sent before it exits. A panic in a task spawned on a Tokio runtime ends only that task (`taskException`), and one on a thread of your own ends only that thread (`unhandled`): both are reported with severity `error`. A hook set with `with_panic_hook` or `with_default_panic_hook` still runs first.
+3. Each report includes the error type, message, stack trace, severity (`error` or `fatal`) and how it was captured (`handled`, `unhandled`, `taskException` or `crash`). A panic is reported with its location and a backtrace.
+4. Errors count against a separate monthly error quota. When it is exhausted, the server rejects new reports until it resets, and the SDK drops them instead of retrying.
+5. Crashes that don't go through Rust's panic handler (a segfault or an abort in native code) aren't captured.
 
 ## Delivery behavior
 
