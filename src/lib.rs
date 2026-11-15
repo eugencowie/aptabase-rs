@@ -3,6 +3,8 @@ mod client;
 mod config;
 mod dispatcher;
 mod sys;
+#[cfg(test)]
+mod test_server;
 
 use std::{panic::PanicHookInfo, sync::Arc, time::Duration};
 

@@ -25,13 +25,27 @@ run = "cargo clippy --all-targets --fix --allow-dirty"
 
 [tasks.check]
 description = "Check formatting, linting, and tests"
-depends = ["check:toolchain", "check:workflows"]
+depends = ["check:toolchain", "check:workflows", "check:tls"]
 run = ["cargo fmt --check", "cargo clippy --all-targets", "cargo test"]
 
 [tasks."check:toolchain"]
 hide = true
 description = "Fail if the pinned toolchain has drifted from rust-version in Cargo.toml"
 run = 'grep -q "^rust-version = \"$(rustc -V | cut -d" " -f2 | cut -d. -f1,2)\"" Cargo.toml'
+
+[tasks."check:tls"]
+hide = true
+description = "Fail if a default or rustls-tls build for Linux or Android pulls in OpenSSL"
+run = '''
+for target in x86_64-unknown-linux-gnu aarch64-linux-android; do
+  for features in "" "--no-default-features --features rustls-tls"; do
+    if cargo tree -e normal --target "$target" $features --prefix none | grep -E '^(openssl-sys|native-tls) '; then
+      echo "OpenSSL in the dependency tree for $target ${features:-(default features)}" >&2
+      exit 1
+    fi
+  done
+done
+'''
 
 [tasks."check:workflows"]
 hide = true

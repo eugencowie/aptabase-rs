@@ -177,7 +177,10 @@ let client = Builder::new("<YOUR_APP_KEY>", env!("CARGO_PKG_VERSION"))
 - Requests contain at most 25 events and use Aptabase's `/api/v0/events` endpoint.
 - Transport failures and HTTP 5xx responses are requeued in memory for a later flush.
 - Other unsuccessful HTTP responses are discarded.
+- The queue isn't saved to disk.
 - This crate provides only the asynchronous Tokio transport; it does not expose a blocking flush API.
+
+Requests use the system proxy settings on macOS and Windows, and the `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` and `NO_PROXY` environment variables on every platform.
 
 ## TLS backends
 
@@ -187,7 +190,7 @@ The SDK uses [`reqwest`](https://crates.io/crates/reqwest) to send events, and y
 | --- | --- |
 | `default-tls` (default) | `reqwest`'s default backend, currently `rustls` |
 | `rustls-tls` | `rustls` |
-| `native-tls` | The platform's native TLS library (OpenSSL on Linux) |
+| `native-tls` | The platform's TLS library: OpenSSL on Linux and Android, Security.framework on Apple platforms, SChannel on Windows |
 
 To switch backend, disable the default features:
 
@@ -195,6 +198,8 @@ To switch backend, disable the default features:
 [dependencies]
 aptabase-rs = { version = "0.3", default-features = false, features = ["native-tls"] }
 ```
+
+Neither `default-tls` nor `rustls-tls` needs OpenSSL, so you can cross-compile for Android and Linux without it.
 
 Without any TLS feature, the SDK can only send events over plain HTTP. That works with `DEV` app keys, which send to `http://localhost:3000`, and with self-hosted servers on an `http://` host. Events sent to an `https://` host fail and are only logged at `debug` level.
 
